@@ -1,0 +1,75 @@
+{
+  "candidate": {
+    "weights": "models/best.pt",
+    "source_checkpoint": "runs/candidates/lanternfly_yolov8/adult_finetune_cpu_416_5e/weights/best.pt",
+    "sha256": "34a44eba7cdb1d115c86420e03826a430937ae4b6c3c73e0872ed85f14fbb46e",
+    "training": {
+      "starting_weights": "yolov8n.pt",
+      "epochs_completed": 5,
+      "imgsz": 416,
+      "batch": 8,
+      "device": "cpu",
+      "workers": 0,
+      "seed": 42,
+      "deterministic": true
+    }
+  },
+  "dataset": {
+    "source": "Roboflow Universe Spotted Lanternfly Annotated Set All Boxes No Null",
+    "version": 7,
+    "license": "CC BY 4.0",
+    "class": "adult spotted lanternfly only",
+    "train": {
+      "images": 1825,
+      "boxes": 2969
+    },
+    "validation": {
+      "images": 438,
+      "boxes": 788
+    },
+    "test": {
+      "images": 276,
+      "boxes": 765,
+      "empty_images": 0
+    },
+    "test_history": "unknown",
+    "annotations_individually_verified": false
+  },
+  "evaluation": {
+    "imgsz": 640,
+    "nms_iou": 0.45,
+    "confidence_selected_on_validation": 0.2,
+    "validation_selection": "validation maximum F1 at IoU 0.50; ties prefer precision, then higher confidence",
+    "test_precision_iou50_at_selected_confidence": 0.7413793103448276,
+    "test_recall_iou50_at_selected_confidence": 0.4496732026143791,
+    "test_tp_fp_fn_iou50": {
+      "tp": 344,
+      "fp": 120,
+      "fn": 421
+    },
+    "standard_metrics_confidence_0_001": {
+      "precision": 0.6174694651837612,
+      "recall": 0.4797385620915033,
+      "map50": 0.5375193069234838,
+      "map50_95": 0.2944495187957615
+    },
+    "count_mae": 1.7282608695652173,
+    "exact_count_images": 190,
+    "per_image_counts_csv": "test_counts.csv",
+    "limitations": [
+      "Source test split prior use is unknown and its results were consulted for comparing checkpoints; metrics are exploratory, not a final untouched test estimate.",
+      "Source test split prior use unknown.",
+      "Annotations are machine-screened, not individually verified.",
+      "No verified empty-scene negatives; false positives on empty scenes not estimated."
+    ],
+    "source_test_results_used_for_candidate_comparison": true
+  },
+  "same_size_comparison": {
+    "previous_checkpoint": "runs/candidates/lanternfly_yolov8/roboflow_v7_adult_cpu_100e_retry1/weights/best.pt",
+    "previous_threshold_selected_on_validation": 0.5,
+    "previous_test_map50": 0.37970167661882304,
+    "previous_test_map50_95": 0.1915025999708965,
+    "previous_test_count_mae": 1.8442028985507246,
+    "previous_test_exact_counts": 189
+  }
+}

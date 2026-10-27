@@ -1,0 +1,7 @@
+# Adult-only, visually screened source version 7 candidate. Local dataset is ignored by Git.
+path: data/candidates/roboflow_v7_adult_reviewed_v1
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: lanternfly

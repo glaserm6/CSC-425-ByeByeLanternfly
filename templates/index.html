@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f5037">
+  <title>Bye Bye Lanternfly</title>
+  <style>
+    :root{font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#203629;background:#f4f7f1}*{box-sizing:border-box}body{max-width:760px;margin:auto;padding:24px 16px 40px}header{margin:10px 0 22px}h1{font-size:clamp(2rem,9vw,3.3rem);line-height:1.05;letter-spacing:-.04em;margin:.3em 0}p{color:#52645a}.card{background:white;border:1px solid #dce7dc;border-radius:18px;padding:clamp(16px,5vw,28px);box-shadow:0 8px 28px #183b2410}.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.button{display:flex;align-items:center;justify-content:center;min-height:52px;padding:12px;border:0;border-radius:12px;background:#20583a;color:white;font:inherit;font-weight:700;font-size:1rem;text-align:center;cursor:pointer}.button.alt{background:#e8f0e8;color:#244b34;border:1px solid #c8d8ca}input[type=file]{position:absolute;width:1px;height:1px;opacity:0}.preview{display:none;width:100%;height:auto;max-height:65vh;object-fit:contain;border-radius:12px;background:#eff3ed;margin-top:14px}.analyze{width:100%;margin:16px 0}.button:disabled{opacity:.5;cursor:wait}.status{min-height:1.5em}.error{color:#a22323}.result{display:none;margin-top:20px;border-top:1px solid #e2e9e1;padding-top:16px}.result img{width:100%;height:auto;border-radius:12px}.count{font-size:1.5rem;font-weight:800;color:#20583a}.note{padding:12px;border-left:3px solid #d1a547;background:#fbfaf3;font-size:.92rem}.muted{font-size:.88rem;color:#69776e}@media(max-width:420px){body{padding:14px 12px 30px}.controls{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header><div class="muted">Photo based monitoring</div><h1>Bye Bye Lanternfly</h1><p>Take or upload a photo to find visible adult spotted lanternflies and count the detections.</p></header>
+  <main class="card">
+    <div class="controls">
+      <label class="button" for="camera">Take a photo</label>
+      <label class="button alt" for="upload">Choose a photo</label>
+    </div>
+    <input id="camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+    <input id="upload" type="file" accept="image/jpeg,image/png,image/webp">
+    <p id="status" class="status" role="status" aria-live="polite">JPEG, PNG, or WebP · up to 12 MB{% if not model_ready %} · Model weights are not installed yet{% endif %}</p>
+    <img id="preview" class="preview" alt="Selected photo preview">
+    <button id="analyze" class="button analyze" disabled>Analyze image</button>
+    <section id="result" class="result" aria-live="polite">
+      <div class="count" id="count"></div>
+      <p id="message"></p>
+      <img id="annotated" alt="Photo annotated with detected lanternfly boxes">
+    </section>
+    <p class="note">The result counts detections visible in this photograph. A single photo does not establish the total population or infestation level in an area.</p>
+    <p class="muted">This project is currently trained for adult spotted lanternflies. Small, distant, hidden, or unclear insects may be missed or misidentified.</p>
+  </main>
+  <script>
+    const maxBytes=12*1024*1024, allowed=['image/jpeg','image/png','image/webp'];
+    const camera=document.querySelector('#camera'), upload=document.querySelector('#upload'), preview=document.querySelector('#preview');
+    const button=document.querySelector('#analyze'), status=document.querySelector('#status'), result=document.querySelector('#result');
+    let selected=null, previewUrl=null;
+    function fail(text){status.classList.add('error');status.textContent=text;}
+    function choose(file){
+      if(!file)return;
+      if(!allowed.includes(file.type)){fail('Choose a JPEG, PNG, or WebP photo.');return;}
+      if(file.size>maxBytes){fail('That photo is too large. Choose one under 12 MB.');return;}
+      selected=file;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(file);preview.src=previewUrl;preview.style.display='block';
+      result.style.display='none';status.classList.remove('error');status.textContent='Photo ready. Tap Analyze image.';button.disabled=false;
+    }
+    camera.addEventListener('change',()=>choose(camera.files[0]));upload.addEventListener('change',()=>choose(upload.files[0]));
+    button.addEventListener('click',async()=>{
+      if(!selected)return;button.disabled=true;status.classList.remove('error');status.textContent='Analyzing photo…';result.style.display='none';
+      try{const body=new FormData();body.append('image',selected);const response=await fetch('/predict',{method:'POST',body});const data=await response.json();if(!response.ok)throw new Error(data.error||'Image analysis failed.');
+        document.querySelector('#count').textContent=`${data.count} adult lanternfly${data.count===1?'':'s'} detected in this photo`;
+        document.querySelector('#message').textContent=data.count===0?'No adult spotted lanternflies were detected in this photo.':`${data.count} retained bounding box${data.count===1?'':'es'} shown.`;
+        document.querySelector('#annotated').src=data.annotated_image;result.style.display='block';status.textContent='Analysis complete.';
+      }catch(error){fail(error.message||'Could not analyze this photo.');}finally{button.disabled=false;}
+    });
+  </script>
+</body>
+</html>

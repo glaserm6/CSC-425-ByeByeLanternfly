@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.cache/
+Ultralytics/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large datasets
+data/raw/
+data/raw_classification/
+data/external/
+data/candidates/
+data/**/*.jpg
+data/**/*.jpeg
+data/**/*.png
+data/**/*.webp
+data/**/*.heic
+data/**/*.heif
+data/**/*.avif
+data/**/*.bmp
+data/**/*.tif
+data/**/*.tiff
+data/labels/**/*.txt
+
+# Model/training outputs
+runs/
+models/*.pt
+models/*.onnx
+*.weights
+*.pt
+*.onnx
+*.engine
+*.safetensors
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Include the selected model for the application
+!models/best.pt
